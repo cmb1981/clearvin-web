@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>CLEARVIN</title>
+</head>
+<body>
+  <h1>CLEARVIN</h1>
+  <p>Understand the deal before you sign.</p>
+
+  <textarea id="input" rows="8" cols="80"></textarea><br />
+  <button id="run">Generate explanation</button>
+
+  <pre id="out"></pre>
+
+  <script>
+    document.getElementById("run").onclick = async () => {
+      const text = document.getElementById("input").value;
+      document.getElementById("out").textContent = "Working...";
+
+      const res = await fetch("/api/doi", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+
+      const data = await res.json();
+      document.getElementById("out").textContent =
+        data.output || JSON.stringify(data);
+    };
+  </script>
+</body>
+</html>
