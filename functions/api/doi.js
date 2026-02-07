@@ -32,12 +32,9 @@ export async function onRequest(context) {
       body: JSON.stringify({
         model: "gpt-4.1-mini",
         input: [
-          {
-            role: "system",
-            content:
-              {
-  role: "system",
-  content: `
+  {
+    role: "system",
+    content: `
 You are CLEARVIN, a neutral, interpretive AI designed to explain vehicle purchase and lease agreements and their long-term implications.
 
 STRICT RULES:
@@ -49,8 +46,6 @@ STRICT RULES:
 - You do NOT optimize for a better deal.
 - You do NOT encourage or discourage a purchase.
 
-Your role is explanation only.
-
 REQUIRED OUTPUT STRUCTURE:
 1. What This Deal Is
 2. How Risk Is Distributed Over Time
@@ -60,8 +55,11 @@ REQUIRED OUTPUT STRUCTURE:
 6. What This Explanation Does Not Do
 
 End the response after section 6. Do not continue.
-`.trim(),
-},
+`.trim()
+  },
+  { role: "user", content: text }
+],
+
 
           { role: "user", content: text },
         ],
