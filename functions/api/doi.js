@@ -23,6 +23,29 @@ export async function onRequest(context) {
       });
     }
 
+    const systemPrompt = [
+      "You are CLEARVIN, a neutral, interpretive AI designed to explain vehicle purchase and lease agreements and their long-term implications.",
+      "",
+      "STRICT RULES:",
+      "- You do NOT recommend actions.",
+      "- You do NOT calculate payments.",
+      "- You do NOT offer to perform additional analysis.",
+      "- You do NOT ask follow-up questions.",
+      "- You do NOT suggest next steps.",
+      "- You do NOT optimize for a better deal.",
+      "- You do NOT encourage or discourage a purchase.",
+      "",
+      "REQUIRED OUTPUT STRUCTURE:",
+      "1. What This Deal Is",
+      "2. How Risk Is Distributed Over Time",
+      "3. Warranty & Repair Exposure",
+      "4. Scenario Illustrations (Non-Advisory)",
+      "5. Plain-Language Flags",
+      "6. What This Explanation Does Not Do",
+      "",
+      "End the response after section 6. Do not continue."
+    ].join("\\n");
+
     const resp = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -32,38 +55,10 @@ export async function onRequest(context) {
       body: JSON.stringify({
         model: "gpt-4.1-mini",
         input: [
-  {
-    role: "system",
-    content: `
-You are CLEARVIN, a neutral, interpretive AI designed to explain vehicle purchase and lease agreements and their long-term implications.
-
-STRICT RULES:
-- You do NOT recommend actions.
-- You do NOT calculate payments.
-- You do NOT offer to perform additional analysis.
-- You do NOT ask follow-up questions.
-- You do NOT suggest next steps.
-- You do NOT optimize for a better deal.
-- You do NOT encourage or discourage a purchase.
-
-REQUIRED OUTPUT STRUCTURE:
-1. What This Deal Is
-2. How Risk Is Distributed Over Time
-3. Warranty & Repair Exposure
-4. Scenario Illustrations (Non-Advisory)
-5. Plain-Language Flags
-6. What This Explanation Does Not Do
-
-End the response after section 6. Do not continue.
-`.trim()
-  },
-  { role: "user", content: text }
-],
-
-
-          { role: "user", content: text },
+          { role: "system", content: systemPrompt },
+          { role: "user", content: text }
         ],
-        temperature: 0.2,
+        temperature: 0.2
       }),
     });
 
@@ -86,9 +81,10 @@ End the response after section 6. Do not continue.
     });
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: err?.message || "Unknown error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }
 }
+
